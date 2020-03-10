@@ -100,8 +100,8 @@ class Vendor extends Person {
   sellTo = (customer, numberOfIceCreams) => {
     let ice_cream_cost = this.price * numberOfIceCreams;
     this.moveTo(customer.location);
-    customer.wallet.debit(ice_cream_cost);
     this.wallet.credit(ice_cream_cost);
+    customer.wallet.debit(ice_cream_cost);
 
   }
 
@@ -123,8 +123,32 @@ class Vendor extends Person {
  *
  * new customer = new Customer(name, x, y);
  **********************************************************/
-class Customer {
-  // implement Customer!
+class Customer extends Person {
+  wallet = new Wallet(10);
+
+
+  _isInRange = vendor => {
+    const distance = this.location.distanceTo(vendor.location);
+
+    const isInRange = distance <= vendor.range;
+
+    return isInRange;
+  }
+
+  _haveEnoughMoney = (vendor, numberOfIceCreams) => {
+    const ice_cream_cost = vendor.price * numberOfIceCreams;
+    return this.wallet.money >= ice_cream_cost;
+
+  }
+
+  requestIceCream = (vendor, numberOfIceCreams) => {
+    if (
+      this._isInRange(vendor) &&
+      this._haveEnoughMoney(vendor, numberOfIceCreams)
+    )
+      vendor.sellTo(this, numberOfIceCreams);
+  }
+
 }
 
 export { Point, Wallet, Person, Customer, Vendor };
